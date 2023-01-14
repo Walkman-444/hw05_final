@@ -60,9 +60,9 @@ class PostFormsTests(TestCase):
         shutil.rmtree(TEMP_MEDIA_ROOT, ignore_errors=True)
 
     def test_create_post(self):
-        '''при отправке валидной формы со страницы
+        """при отправке валидной формы со страницы
         создания поста создаётся новая запись в базе данных
-        '''
+        """
         post_count = Post.objects.count()
         form_data = {
             'text': self.post.text,
@@ -86,9 +86,9 @@ class PostFormsTests(TestCase):
         )
 
     def test_post_edit(self):
-        '''при отправке валидной формы со страницы
+        """при отправке валидной формы со страницы
         редактирования поста происходит изменение поста
-        '''
+        """
         post_count = Post.objects.count()
         form_data = {
             'text': 'Редактируем тестовый пост',
@@ -106,8 +106,32 @@ class PostFormsTests(TestCase):
         self.assertEqual(modified_post.text, form_data['text'])
         self.assertEqual(modified_post.group.pk, form_data['group'])
 
+    def test_old_group_response(self):
+        """Проверяем, что пост исчез со старой страницы группы"""
+        group_2 = Group.objects.create(
+            title='Тестовая группа 2',
+            slug='test_slug2',
+            description='Тестовое описание 2')
+        form_data = {
+            'text': 'Редактируем тестовый пост',
+            'group': group_2.pk,
+        }
+        self.authorized_client.post(
+            reverse('posts:post_edit', args=({self.post.pk})),
+            data=form_data,
+            follow=True
+        )
+        old_group_response = self.authorized_client.get(
+            reverse('posts:group_list', args=({self.group.slug}))
+        )
+        new_group_response = self.authorized_client.get(
+            reverse('posts:group_list', args=({group_2.slug}))
+        )
+        self.assertEqual(len(old_group_response.context.get('page_obj')), 0)
+        self.assertEqual(len(new_group_response.context.get('page_obj')), 1)
+
     def test_can_be_written_by_an_authorized_user(self):
-        '''комментировать посты может только авторизованный пользователь'''
+        """комментировать посты может только авторизованный пользователь"""
         comments_count = Comment.objects.count()
         comment_data = {
             'text': 'Тестовый комментарий',

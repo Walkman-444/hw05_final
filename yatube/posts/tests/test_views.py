@@ -99,7 +99,7 @@ class PostViewsTests(TestCase):
                 self.assertTemplateUsed(response, template)
 
     def test_homepage_show_correct_context(self):
-        '''Шаблон index сформирован с правильным контекстом.'''
+        """Шаблон index сформирован с правильным контекстом"""
         response = self.authorized_client.get(reverse('posts:index'))
         expected = list(Post.objects.all()[:POST_COUNT])
         self.assertEqual(list(response.context['page_obj']), expected)
@@ -108,7 +108,7 @@ class PostViewsTests(TestCase):
         self.assertEqual(image_in_post, self.post.image)
 
     def test_group_list_show_correct_context(self):
-        '''Шаблон group_list сформирован с правильным контекстом.'''
+        """Шаблон group_list сформирован с правильным контекстом"""
         response = self.client.get(
             reverse('posts:group_list', kwargs={'slug': self.group.slug})
         )
@@ -120,7 +120,7 @@ class PostViewsTests(TestCase):
         self.assertEqual(image_in_post, self.post.image)
 
     def test_profile_show_correct_context(self):
-        '''Шаблон profile сформирован с правильным контекстом.'''
+        """Шаблон profile сформирован с правильным контекстом"""
         response = self.client.get(
             reverse('posts:profile', args={self.user})
         )
@@ -131,7 +131,7 @@ class PostViewsTests(TestCase):
         self.assertEqual(image_in_post, self.post.image)
 
     def test_post_detail_show_correct_context(self):
-        '''Шаблон post_detail сформирован с правильным контекстом.'''
+        """Шаблон post_detail сформирован с правильным контекстом"""
         response = self.client.get(
             reverse('posts:post_detail', kwargs={'post_id': self.post.pk}))
         expected = response.context['post']
@@ -141,7 +141,7 @@ class PostViewsTests(TestCase):
         self.assertEqual(image_in_post, self.post.image)
 
     def test_create_edit_show_correct_context(self):
-        '''Шаблон create_edit сформирован с правильным контекстом.'''
+        """Шаблон create_edit сформирован с правильным контекстом"""
         response = self.authorized_client.get(
             reverse('posts:post_edit', kwargs={'post_id': self.post.pk})
         )
@@ -155,7 +155,7 @@ class PostViewsTests(TestCase):
                 self.assertIsInstance(form_field, expected)
 
     def test_create_show_correct_context(self):
-        '''Шаблон create_post сформирован с правильным контекстом.'''
+        """Шаблон create_post сформирован с правильным контекстом"""
         response = self.authorized_client.get(reverse('posts:post_create'))
         form_fields = {
             'text': forms.fields.CharField,
@@ -167,9 +167,9 @@ class PostViewsTests(TestCase):
                 self.assertIsInstance(form_field, expected)
 
     def test_check_group_in_pages(self):
-        '''Проверяем, что если при создании поста указать группу,
+        """Проверяем, что если при создании поста указать группу,
         то этот пост появляется:
-        '''
+        """
         form_fields = {
             reverse('posts:index'),
             reverse('posts:group_list', kwargs={'slug': self.group.slug}),
@@ -184,9 +184,9 @@ class PostViewsTests(TestCase):
                 self.assertEqual(form_field, self.post)
 
     def test_check_group_not_in_mistake_group_list_page(self):
-        '''Проверяем, что этот пост не попал в группу,
+        """Проверяем, что этот пост не попал в группу,
         для которой не был предназначен
-        '''
+        """
         form_fields = {
             reverse(
                 'posts:group_list', kwargs={'slug': self.group.slug}
@@ -199,7 +199,7 @@ class PostViewsTests(TestCase):
                 self.assertNotIn(expected, form_field)
 
     def test_post_detail_has_comment(self):
-        '''после успешной отправки комментарий появляется на странице поста'''
+        """после успешной отправки комментарий появляется на странице поста"""
         response = self.authorized_client.get(
             reverse('posts:post_detail', kwargs={'post_id': self.post.id})
         )
@@ -208,7 +208,7 @@ class PostViewsTests(TestCase):
                 self.assertEqual(comment, self.comment)
 
     def test_cache(self):
-        '''проверка кеширования главной страницы'''
+        """проверка кеширования главной страницы"""
         new_post = Post.objects.create(
             group=self.group,
             author=self.user,
@@ -229,8 +229,8 @@ class PostViewsTests(TestCase):
         self.assertNotEqual(response.content, response_3.content)
 
     def test_follow(self):
-        '''Авторизованный пользователь может подписываться
-        на других пользователей и удалять их из подписок'''
+        """Авторизованный пользователь может подписываться
+        на других пользователей и удалять их из подписок"""
         self.authorized_client.get(
             reverse(
                 'posts:profile_follow', kwargs={'username': self.user_2})
@@ -248,9 +248,9 @@ class PostViewsTests(TestCase):
         )
 
     def test_new_post_show(self):
-        '''Новая запись пользователя появляется в ленте тех,
-        кто на него подписан.
-        '''
+        """Новая запись пользователя появляется в ленте тех,
+        кто на него подписан
+        """
         Follow.objects.create(
             user=self.user,
             author=self.user_2,
@@ -265,9 +265,9 @@ class PostViewsTests(TestCase):
         self.assertIn(post, response_auth)
 
     def test_new_post_not_show(self):
-        '''Новая запись не появляется в ленте тех,
-        кто не подписан.
-        '''
+        """Новая запись не появляется в ленте тех,
+        кто не подписан
+        """
         post = Post.objects.create(
             text='Тестовый пост',
             author=self.user_2

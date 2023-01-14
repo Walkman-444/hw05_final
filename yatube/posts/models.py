@@ -1,6 +1,7 @@
-from core.models import CreatedModel
 from django.contrib.auth import get_user_model
 from django.db import models
+
+from core.models import CreatedModel
 
 User = get_user_model()
 
@@ -8,9 +9,11 @@ POSTS_COUNT = 15
 
 
 class Group(models.Model):
-    title = models.CharField(max_length=200)
-    slug = models.SlugField(unique=True)
-    description = models.TextField()
+    title = models.CharField(max_length=200, verbose_name='Название группы')
+    slug = models.SlugField(
+        unique=True, verbose_name='Уникальная ссылка группы'
+    )
+    description = models.TextField(verbose_name='Описание группы')
 
     def __str__(self):
         return self.title
